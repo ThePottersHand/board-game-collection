@@ -5,6 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Board Game Collection</title>
   <style>
+  
+  @media (max-width: 767px) {
+  /* Styles for mobile devices */
+  .container {
+    padding: 10px;
+  }
+
+  label, input, button {
+    font-size: 16px;
+  }
+
+  #filters {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .filter-box {
+    margin-bottom: 10px;
+    width: 100%;
+  }
+
+  .filter-item {
+    margin-bottom: 10px;
+  }
+
+  th, td {
+    padding: 10px;
+  }
+}
     body {
       font-family: Arial, sans-serif;
       background-color: #f0f0f0;
@@ -355,6 +384,24 @@ function clearFilters() {
 
   applyFilters();
 }
+
+function getUrlParameter(parameterName) {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(parameterName);
+}
+
+function setUsernameAndFetch() {
+  const usernameParam = getUrlParameter("username");
+  if (usernameParam) {
+    const usernameInput = document.getElementById("username");
+    usernameInput.value = usernameParam;
+    fetchGameData();
+  }
+}
+
+// Call this function to set the username from the URL and fetch data
+setUsernameAndFetch();
+
 // Add input event listeners for the filter input fields with debounce
 document.getElementById("player-number").addEventListener("input", debounce(applyFilters, 300));
 document.getElementById("duration").addEventListener("input", debounce(applyFilters, 300));
