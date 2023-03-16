@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Board Game Collection</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    label, input, button {
+      display: inline-block;
+      font-size: 14px;
+    }
+
+    input {
+      padding: 5px 10px;
+      margin: 0 10px 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+
+    button {
+      background-color: #0066cc;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      padding: 5px 10px;
+      margin-bottom: 10px;
+    }
+
+    button:hover {
+      background-color: #0055aa;
+    }
+
+    #filters {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #fff;
+    }
+
+    th, td {
+      padding: 15px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #f2f2f2;
+      cursor: pointer;
+    }
+
+    th.sorted {
+      background-color: #d7d7d7;
+    }
+	
+	.filter-box {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.filter-box input[type="number"] {
+  width: 80px;
+}
+
+.filter-box h2 {
+  margin: 0 0 10px;
+  font-size: 18px;
+  font-weight: normal;
+}
+
+.filter-item {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 10px;
+}
+
+.filter-item label {
+  margin-right: 5px;
+}
+
+th.sorted-asc::after, th.sorted-desc::after {
+  content: "";
+  display: inline-block;
+  margin-left: 5px;
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+}
+
+th.sorted-asc::after {
+  border-bottom: 4px solid #333;
+}
+
+th.sorted-desc::after {
+  border-top: 4px solid #333;
+}
+
+table img {
+  max-width: 50px;
+  max-height: 50px;
+  margin-right: 10px;
+}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Board Game Collection</h1>
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username">
+    <button onclick="fetchGameData()">Fetch Game Data</button>
+<div id="filters" style="display: none;">
+  <div class="filter-box">
+    <h2>Filters</h2>
+    <div class="filter-item">
+      <label for="player-number">Player Number:</label>
+      <input type="number" id="player-number" name="player-number" min="0">
+    </div>
+    <div class="filter-item">
+      <label for="duration">Max Duration (min):</label>
+      <input type="number" id="duration" name="duration" min="0">
+    </div>
+    <div class="filter-item">
+      <label for="min-bgg-rating">Min BGG Rating:</label>
+      <input type="number" id="min-bgg-rating" name="min-bgg-rating" step="0.1" min="0">
+    </div>
+    <button onclick="clearFilters()">Clear Filters</button>
+  </div>
+  <button onclick="chooseForMe()">Choose for me!</button>
+</div>
+    <div id="row-count">0 games displayed</div>
+    <table>
+      <thead>
+        <tr>
+          <th onclick="sortTable(0)">Name</th>
+          <th onclick="sortTable(1)">Min Players</th>
+          <th onclick="sortTable(2)">Max Players</th>
+          <th onclick="sortTable(3)">Playing Time</th>
+          <th onclick="sortTable(4)">BGG Rating</th>
+        </tr>
+      </thead>
+      <tbody id="game-data">
+      </tbody>
+    </table>
+    <script>
+async function fetchGameData() {
+  const username = document.getElementById("username").value;
+  const response = await fetch(`https://api.geekdo.com/xmlapi/collection/${username}?excludesubtype=boardgameexpansion`);
+  const data = await response.text();
+  const parser = new DOMParser();
+  const xmlDoc = parser.parseFromString(data, "application/xml");
+  const items = xmlDoc.getElementsByTagName("item");
+  const tableBody = document.getElementById("game-data");
+  tableBody.innerHTML = "";
+
+  for (let i = 0; i < items.length; i++) {
+    const name = items[i].getElementsByTagName("name")[0].textContent;
+    const minPlayers = items[i].getElementsByTagName("stats")[0].getAttribute("minplayers");
+    const maxPlayers = items[i].getElementsByTagName("stats")[0].getAttribute("maxplayers");
+    const playingTime = items[i].getElementsByTagName("stats")[0].getAttribute("playingtime");
+    const bggRating = parseFloat(items[i].getElementsByTagName("rating")[0].getElementsByTagName("bayesaverage")[0].getAttribute("value")).toFixed(1);
+    const thumbnailUrl = items[i].getElementsByTagName("thumbnail")[0].textContent;
+
+    const row = `
+      <tr>
+        <td><img src="${thumbnailUrl}" alt="${name}" /> ${name}</td>
+        <td>${minPlayers}</td>
+        <td>${maxPlayers}</td>
+        <td>${playingTime} min</td>
+        <td>${bggRating}</td>
+      </tr>
+    `;
+    tableBody.innerHTML += row;
+  }
+  document.getElementById("filters").style.display = "block";
+  updateRowCount();
+}
+
+let currentSortedColumn = -1;
+let currentSortedDirection = "asc";
+
+function sortTable(n) {
+  const table = document.querySelector("table");
+  const tbody = table.querySelector("tbody");
+  const rows = Array.from(tbody.querySelectorAll("tr"));
+  const th = table.querySelectorAll("th");
+
+  if (currentSortedColumn === n) {
+    currentSortedDirection = currentSortedDirection === "asc" ? "desc" : "asc";
+  } else {
+    currentSortedColumn = n;
+    currentSortedDirection = "asc";
+  }
+
+  th.forEach(header => header.classList.remove("sorted"));
+ th.forEach(header => {
+    header.classList.remove("sorted-asc");
+    header.classList.remove("sorted-desc");
+  });
+  th[n].classList.add(currentSortedDirection === "asc" ? "sorted-asc" : "sorted-desc");
+
+  const sortedRows = rows.sort((a, b) => {
+    const aValue = n === 0 ? a.cells[n].innerText.toLowerCase() : parseFloat(a.cells[n].innerText);
+    const bValue = n === 0 ? b.cells[n].innerText.toLowerCase() : parseFloat(b.cells[n].innerText);
+
+    if (n === 0) {
+      return currentSortedDirection === "asc" ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+    } else {
+      return currentSortedDirection === "asc" ? aValue - bValue : bValue - aValue;
+    }
+  });
+
+  tbody.innerHTML = "";
+  sortedRows.forEach(row => tbody.appendChild(row));
+}
+
+function applyFilters() {
+  if (currentlyFlashingRow) {
+    currentlyFlashingRow.style.backgroundColor = "";
+    clearTimeout(currentlyFlashingRow.flashTimeout);
+    currentlyFlashingRow = null;
+  }
+
+  const playerNumberFilter = parseInt(document.getElementById("player-number").value, 10) || null;
+  const durationFilter = parseInt(document.getElementById("duration").value, 10) || null;
+  const minBggRatingFilter = parseFloat(document.getElementById("min-bgg-rating").value) || null;
+
+  const table = document.querySelector("table");
+  const tbody = table.querySelector("tbody");
+  const rows = Array.from(tbody.querySelectorAll("tr"));
+
+  rows.forEach(row => {
+    const minPlayers = parseInt(row.cells[1].innerText, 10);
+    const maxPlayers = parseInt(row.cells[2].innerText, 10);
+    const duration = parseInt(row.cells[3].innerText, 10);
+    const bggRating = parseFloat(row.cells[4].innerText);
+
+    if (
+      (!playerNumberFilter || (minPlayers <= playerNumberFilter && maxPlayers >= playerNumberFilter)) &&
+      (!durationFilter || duration <= durationFilter) &&
+      (!minBggRatingFilter || bggRating >= minBggRatingFilter)
+    ) {
+      row.style.display = "";
+    } else {
+      row.style.display = "none";
+    }
+  });
+
+  // Update row count
+  updateRowCount();
+}
+
+
+let currentlyFlashingRow = null;
+
+async function chooseForMe() {
+  if (currentlyFlashingRow) {
+    currentlyFlashingRow.style.backgroundColor = "";
+    clearTimeout(currentlyFlashingRow.flashTimeout);
+    currentlyFlashingRow = null;
+  }
+
+  const table = document.querySelector("table");
+  const tbody = table.querySelector("tbody");
+  const rows = Array.from(tbody.querySelectorAll("tr")).filter(row => row.style.display !== "none");
+
+  if (rows.length === 0) {
+    alert("No games to choose from. Please adjust your filters.");
+    return;
+  }
+
+  const selectedRowIndex = Math.floor(Math.random() * rows.length);
+  const selectedRow = rows[selectedRowIndex];
+
+  // Scroll to the selected row
+  selectedRow.scrollIntoView({ behavior: "smooth", block: "center" });
+
+  // Make the final flash keep flashing indefinitely
+  const flashDuration = 200;
+  const startFlashing = () => {
+    selectedRow.style.backgroundColor = selectedRow.style.backgroundColor === "yellow" ? "" : "yellow";
+    selectedRow.flashTimeout = setTimeout(startFlashing, flashDuration);
+  };
+  startFlashing();
+
+  currentlyFlashingRow = selectedRow;
+}
+ function getUrlParameter(parameterName) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(parameterName);
+    }
+
+    function setUsernameAndFetch() {
+      const usernameParam = getUrlParameter("username");
+      if (usernameParam) {
+        const usernameInput = document.getElementById("username");
+        usernameInput.value = usernameParam;
+        fetchGameData();
+      }
+    }
+
+    // Call this function to set the username from the URL and fetch data
+    setUsernameAndFetch();
+	
+function debounce(func, wait) {
+  let timeout;
+  return function (...args) {
+    const context = this;
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(context, args), wait);
+  };
+}
+function updateRowCount() {
+  const table = document.querySelector("table");
+  const tbody = table.querySelector("tbody");
+  const rows = Array.from(tbody.querySelectorAll("tr"));
+  const totalRowCount = rows.length;
+  const visibleRowCount = rows.filter(row => row.style.display !== "none").length;
+
+  document.getElementById("row-count").textContent = `${visibleRowCount} of ${totalRowCount} games displayed`;
+}
+
+function clearFilters() {
+  document.getElementById("player-number").value = "";
+  document.getElementById("duration").value = "";
+  document.getElementById("min-bgg-rating").value = "";
+
+  applyFilters();
+}
+// Add input event listeners for the filter input fields with debounce
+document.getElementById("player-number").addEventListener("input", debounce(applyFilters, 300));
+document.getElementById("duration").addEventListener("input", debounce(applyFilters, 300));
+document.getElementById("min-bgg-rating").addEventListener("input", debounce(applyFilters, 300));
+  </script>
+</body>
+</html>
