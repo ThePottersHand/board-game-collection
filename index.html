@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<link rel="manifest" href="/manifest.json">
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css" crossorigin="anonymous">
@@ -70,7 +71,6 @@ h1::after {
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
     background-image: url('background.png');
     background-repeat: no-repeat;
     background-position: center center;
@@ -307,6 +307,15 @@ h1::after {
 </style>
 </head>
 <body>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(registration => console.log('Service Worker registered:', registration))
+        .catch(error => console.error('Service Worker registration failed:', error));
+    });
+  }
+</script>
   <div class="background-container"></div>
   <div class="container">
     <h1>Hit The Table!</h1>
@@ -612,6 +621,17 @@ document.querySelectorAll(".collapsible-header").forEach(header => {
     header.querySelector(".chevron").classList.toggle("rotate-up");
   });
 });
+
+function setBgContainerHeight() {
+  const bgContainer = document.querySelector('.background-container');
+  bgContainer.style.height = `${window.innerHeight}px`;
+}
+
+// Set the initial height
+setBgContainerHeight();
+
+// Update the height when the window is resized
+window.addEventListener('resize', setBgContainerHeight);
   </script>
 </body>
 </html>
