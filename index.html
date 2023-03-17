@@ -3,16 +3,32 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css" crossorigin="anonymous">
   <title>Hit The Table!</title>
 <style>
 
 body {
     position: relative;
-    background-image: url('background.png');
-    background-repeat: no-repeat; /* Change this value */
-    background-position: center center;
-    background-size: cover; /* Add this property to cover the entire background */
-    background-attachment: fixed;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+h1 {
+  font-family: 'Arial', sans-serif;
+  font-size: 2.5rem;
+  color: #333;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+/* This style is for adding a line separator under the heading */
+h1::after {
+  content: "";
+  display: block;
+  width: 50%;
+  height: 2px;
+  background-color: #333;
+  margin: 1rem auto;
 }
 
   /* General styles */
@@ -49,6 +65,18 @@ body {
   background-color: #0055aa;
 }
 
+.background-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('background.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    z-index: -1;
+}
 
 .collapsible-content {
   overflow: hidden;
@@ -256,9 +284,30 @@ body {
   td:nth-of-type(4):before { content: "Playing Time"; }
   td:nth-of-type(5):before { content: "BGG Rating"; }
 }
+
+  .filter-icon {
+    display: none;
+  }
+
+  /* Media query for mobile devices */
+  @media (max-width: 767px) {
+    .filter-label {
+      display: none;
+    }
+    .filter-icon {
+      display: inline;
+    }
+	
+      .filter-box button,
+.username-box button	  {
+        margin-top: 10px;
+      }
+    
+  }
 </style>
 </head>
 <body>
+  <div class="background-container"></div>
   <div class="container">
     <h1>Hit The Table!</h1>
 <div class="collapsible-header">
@@ -283,18 +332,21 @@ body {
     <div class="collapsible-content">
   <div class="filter-box">
 
-    <div class="filter-item">
-      <label for="player-number">Players:</label>
-      <input type="number" id="player-number" name="player-number" min="0">
-    </div>
-    <div class="filter-item">
-      <label for="duration">Max Time(min):</label>
-      <input type="number" id="duration" name="duration" min="0">
-    </div>
-    <div class="filter-item">
-      <label for="min-bgg-rating">BGG Rating:</label>
-      <input type="number" id="min-bgg-rating" name="min-bgg-rating" step="0.1" min="0">
-    </div>
+<div class="filter-item">
+  <label for="player-number" class="filter-label">Players:</label>
+  <i class="filter-icon fas fa-users"></i>
+  <input type="number" id="player-number" name="player-number" min="0">
+</div>
+<div class="filter-item">
+  <label for="duration" class="filter-label">Max Time(min):</label>
+  <i class="filter-icon fas fa-hourglass-half"></i>
+  <input type="number" id="duration" name="duration" min="0">
+</div>
+<div class="filter-item">
+  <label for="min-bgg-rating" class="filter-label">BGG Rating:</label>
+  <i class="filter-icon fas fa-star"></i>
+  <input type="number" id="min-bgg-rating" name="min-bgg-rating" step="0.1" min="0">
+</div>
     <button onclick="clearFilters()">Clear Filters</button>
   </div>
 
@@ -362,6 +414,10 @@ async function fetchGameData() {
 
     document.getElementById("filters").style.display = "block";
     updateRowCount();
+    
+    // Collapse the username box after successful fetch
+    document.querySelector(".collapsible-header").click();
+    
   } catch (error) {
     document.getElementById("loading-message").style.display = "none";
     document.getElementById("error-message").style.display = "block";
