@@ -3,190 +3,310 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Board Game Collection</title>
-  <style>
+  <title>Hit The Table!</title>
+<style>
+
+body {
+    position: relative;
+    background-image: url('background.png');
+    background-repeat: no-repeat; /* Change this value */
+    background-position: center center;
+    background-size: cover; /* Add this property to cover the entire background */
+    background-attachment: fixed;
+}
+
+  /* General styles */
+.collapsible-header {
+  cursor: pointer;
+  background-color: #0066cc;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chevron {
+  border: solid #fff;
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 3px;
+  transition: transform 0.3s ease;
+}
+
+.rotate-down {
+  transform: rotate(45deg);
+}
+
+.rotate-up {
+  transform: rotate(-135deg);
+}
+
+.collapsible-header:hover {
+  background-color: #0055aa;
+}
+
+
+.collapsible-content {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.3s ease;
+}
   
-  @media (max-width: 767px) {
-  /* Styles for mobile devices */
+
   .container {
-    padding: 10px;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 20px;
   }
 
-  label, input, button {
-    font-size: 16px;
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 2.5rem;
+    font-weight: 600;
   }
 
-  #filters {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .filter-box {
+  /* Button styles */
+  button {
+    background-color: #0066cc;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    padding: 10px 20px;
     margin-bottom: 10px;
-    width: 100%;
+    font-weight: 600;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+  }
+
+  button:hover {
+    background-color: #0055aa;
+  }
+
+  /* Filter styles */
+  #filters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  .username-box {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 20px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .filter-box {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 20px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+
+  .filter-box input[type="number"] {
+    width: 50px;
+  }
+
+  .filter-box h2 {
+    margin: 0 0 10px;
+    font-size: 1.5rem;
+    font-weight: 600;
   }
 
   .filter-item {
-    margin-bottom: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
   }
 
-  th, td {
-    padding: 10px;
+  .filter-item label {
+    font-weight: 600;
   }
-}
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f0f0f0;
-      color: #333;
-      margin: 0;
-      padding: 0;
-    }
 
-    .container {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    label, input, button {
-      display: inline-block;
-      font-size: 14px;
-    }
-
-    input {
-      padding: 5px 10px;
-      margin: 0 10px 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 3px;
-    }
-
-    button {
-      background-color: #0066cc;
-      color: #fff;
-      border: none;
-      border-radius: 3px;
-      cursor: pointer;
-      padding: 5px 10px;
-      margin-bottom: 10px;
-    }
-
-    button:hover {
-      background-color: #0055aa;
-    }
-
-    #filters {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background-color: #fff;
-    }
-
-    th, td {
-      padding: 15px;
-      text-align: left;
-      border-bottom: 1px solid #ddd;
-    }
-
-    th {
-      background-color: #f2f2f2;
-      cursor: pointer;
-    }
-
-    th.sorted {
-      background-color: #d7d7d7;
-    }
-	
-	.filter-box {
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 15px;
+  /* Table styles */
+  
+.table-container {
+  max-height: 400px;
+  overflow-y: auto;
   margin-bottom: 20px;
 }
 
-.filter-box input[type="number"] {
-  width: 80px;
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  th, td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+
+  th {
+    background-color: #f2f2f2;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  th.sorted {
+    background-color: #d7d7d7;
+  }
+
+  th.sorted-asc::after, th.sorted-desc::after {
+    content: "";
+    display: inline-block;
+    margin-left: 5px;
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+  }
+
+  th.sorted-asc::after {
+    border-bottom: 4px solid #333;
+  }
+
+  th.sorted-desc::after {
+    border-top: 4px solid #333;
+  }
+
+  table img {
+    max-width: 50px;
+    max-height: 50px;
+    margin-right: 10px;
+    border-radius: 3px;
+  }
+
+  tr:hover {
+    background-color: #f2f2f2;
+  }
+  
+  .flashing {
+  animation: flashing .6s infinite alternate;
 }
 
-.filter-box h2 {
-  margin: 0 0 10px;
-  font-size: 18px;
-  font-weight: normal;
+@keyframes flashing {
+  0% {
+    background-color: #fff;
+  }
+  100% {
+    background-color: #a8c3d1;
+  }
 }
 
-.filter-item {
-  display: inline-flex;
-  align-items: center;
-  margin-right: 10px;
+.responsive-table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
-.filter-item label {
-  margin-right: 5px;
-}
+@media screen and (max-width: 600px) {
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
 
-th.sorted-asc::after, th.sorted-desc::after {
-  content: "";
-  display: inline-block;
-  margin-left: 5px;
-  width: 0;
-  height: 0;
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-}
+  thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
 
-th.sorted-asc::after {
-  border-bottom: 4px solid #333;
-}
+  tr {
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+  }
 
-th.sorted-desc::after {
-  border-top: 4px solid #333;
-}
+  td {
+    border: none;
+    border-bottom: 1px solid #ddd;
+    position: relative;
+    padding-left: 50%;
+    font-size: 14px; /* Adjust the font size for mobile devices */
+  }
 
-table img {
-  max-width: 50px;
-  max-height: 50px;
-  margin-right: 10px;
+  td:before {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    width: 45%;
+    padding-right: 10px;
+    white-space: nowrap;
+    font-weight: 600;
+    font-size: 14px; /* Adjust the font size for mobile devices */
+  }
+
+  td:nth-of-type(1):before { content: "Name"; }
+  td:nth-of-type(2):before { content: "Min Players"; }
+  td:nth-of-type(3):before { content: "Max Players"; }
+  td:nth-of-type(4):before { content: "Playing Time"; }
+  td:nth-of-type(5):before { content: "BGG Rating"; }
 }
-  </style>
+</style>
 </head>
 <body>
   <div class="container">
-    <h1>Board Game Collection</h1>
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username">
-    <button onclick="fetchGameData()">Fetch Game Data</button>
+    <h1>Hit The Table!</h1>
+<div class="collapsible-header">
+  Username Entry
+  <span class="chevron rotate-down"></span>
+</div>
+  <div class="collapsible-content">
+    <div class="username-box">
+
+      <input type="text" id="username" placeholder="Enter BGG Username" />
+      <button onclick="fetchGameData()">Fetch Game Data</button>
+    </div>
+</div>
+	<div id="loading-message" style="display: none; text-align: center;">Loading...</div>
+	<div id="error-message" style="display: none; text-align: center; color: red;">Error: Please check that you are entering a real BGG username with a public Collection.</div>
+
 <div id="filters" style="display: none;">
+<div class="collapsible-header">
+  Filters
+  <span class="chevron rotate-down"></span>
+</div>
+    <div class="collapsible-content">
   <div class="filter-box">
-    <h2>Filters</h2>
+
     <div class="filter-item">
-      <label for="player-number">Player Number:</label>
+      <label for="player-number">Players:</label>
       <input type="number" id="player-number" name="player-number" min="0">
     </div>
     <div class="filter-item">
-      <label for="duration">Max Duration (min):</label>
+      <label for="duration">Max Time(min):</label>
       <input type="number" id="duration" name="duration" min="0">
     </div>
     <div class="filter-item">
-      <label for="min-bgg-rating">Min BGG Rating:</label>
+      <label for="min-bgg-rating">BGG Rating:</label>
       <input type="number" id="min-bgg-rating" name="min-bgg-rating" step="0.1" min="0">
     </div>
     <button onclick="clearFilters()">Clear Filters</button>
   </div>
-  <button onclick="chooseForMe()">Choose for me!</button>
-</div>
+
+</div><br>
+	  <button onclick="chooseForMe()">Choose for me!</button>
+	  <br>
+	<div id="loading-message" style="display: none; text-align: center;">Loading...</div>
+	<div id="error-message" style="display: none; text-align: center; color: red;">Error: Please check that you are entering a real BGG username with a public Collection.</div>
     <div id="row-count">0 games displayed</div>
-    <table>
+	
+<div class="table-container">
+  <table class="responsive-table">
       <thead>
         <tr>
           <th onclick="sortTable(0)">Name</th>
@@ -198,41 +318,57 @@ table img {
       </thead>
       <tbody id="game-data">
       </tbody>
-    </table>
-    <script>
+  </table>
+</div>
+<script>
 async function fetchGameData() {
+  document.getElementById("loading-message").style.display = "block";
+  document.getElementById("error-message").style.display = "none";
+
   const username = document.getElementById("username").value;
-  const response = await fetch(`https://api.geekdo.com/xmlapi/collection/${username}?excludesubtype=boardgameexpansion`);
-  const data = await response.text();
-  const parser = new DOMParser();
-  const xmlDoc = parser.parseFromString(data, "application/xml");
-  const items = xmlDoc.getElementsByTagName("item");
-  const tableBody = document.getElementById("game-data");
-  tableBody.innerHTML = "";
+  try {
+    const response = await fetch(`https://api.geekdo.com/xmlapi/collection/${username}?excludesubtype=boardgameexpansion`);
 
-  for (let i = 0; i < items.length; i++) {
-    const name = items[i].getElementsByTagName("name")[0].textContent;
-    const minPlayers = items[i].getElementsByTagName("stats")[0].getAttribute("minplayers");
-    const maxPlayers = items[i].getElementsByTagName("stats")[0].getAttribute("maxplayers");
-    const playingTime = items[i].getElementsByTagName("stats")[0].getAttribute("playingtime");
-    const bggRating = parseFloat(items[i].getElementsByTagName("rating")[0].getElementsByTagName("bayesaverage")[0].getAttribute("value")).toFixed(1);
-    const thumbnailUrl = items[i].getElementsByTagName("thumbnail")[0].textContent;
+    if (!response.ok) {
+      throw new Error('Fetch failed');
+    }
 
-    const row = `
-      <tr>
-        <td><img src="${thumbnailUrl}" alt="${name}" /> ${name}</td>
-        <td>${minPlayers}</td>
-        <td>${maxPlayers}</td>
-        <td>${playingTime} min</td>
-        <td>${bggRating}</td>
-      </tr>
-    `;
-    tableBody.innerHTML += row;
+    const data = await response.text();
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(data, "application/xml");
+    const items = xmlDoc.getElementsByTagName("item");
+    const tableBody = document.getElementById("game-data");
+    tableBody.innerHTML = "";
+
+    for (let i = 0; i < items.length; i++) {
+      const name = items[i].getElementsByTagName("name")[0].textContent;
+      const minPlayers = items[i].getElementsByTagName("stats")[0].getAttribute("minplayers");
+      const maxPlayers = items[i].getElementsByTagName("stats")[0].getAttribute("maxplayers");
+      const playingTime = items[i].getElementsByTagName("stats")[0].getAttribute("playingtime");
+      const bggRating = parseFloat(items[i].getElementsByTagName("rating")[0].getElementsByTagName("bayesaverage")[0].getAttribute("value")).toFixed(1);
+      const thumbnailUrl = items[i].getElementsByTagName("thumbnail")[0].textContent;
+
+      const row = `
+        <tr>
+          <td><img src="${thumbnailUrl}" alt="${name}" /> ${name}</td>
+          <td>${minPlayers}</td>
+          <td>${maxPlayers}</td>
+          <td>${playingTime} min</td>
+          <td>${bggRating}</td>
+        </tr>
+      `;
+      tableBody.innerHTML += row;
+    }
+
+    document.getElementById("filters").style.display = "block";
+    updateRowCount();
+  } catch (error) {
+    document.getElementById("loading-message").style.display = "none";
+    document.getElementById("error-message").style.display = "block";
+    console.error('Error fetching data:', error);
   }
-  document.getElementById("filters").style.display = "block";
-  updateRowCount();
+  document.getElementById("loading-message").style.display = "none";
 }
-
 let currentSortedColumn = -1;
 let currentSortedDirection = "asc";
 
@@ -312,7 +448,7 @@ let currentlyFlashingRow = null;
 
 async function chooseForMe() {
   if (currentlyFlashingRow) {
-    currentlyFlashingRow.style.backgroundColor = "";
+    currentlyFlashingRow.classList.remove("flashing");
     clearTimeout(currentlyFlashingRow.flashTimeout);
     currentlyFlashingRow = null;
   }
@@ -332,13 +468,8 @@ async function chooseForMe() {
   // Scroll to the selected row
   selectedRow.scrollIntoView({ behavior: "smooth", block: "center" });
 
-  // Make the final flash keep flashing indefinitely
-  const flashDuration = 200;
-  const startFlashing = () => {
-    selectedRow.style.backgroundColor = selectedRow.style.backgroundColor === "yellow" ? "" : "yellow";
-    selectedRow.flashTimeout = setTimeout(startFlashing, flashDuration);
-  };
-  startFlashing();
+  // Add the flashing class to the selected row
+  selectedRow.classList.add("flashing");
 
   currentlyFlashingRow = selectedRow;
 }
@@ -355,9 +486,6 @@ async function chooseForMe() {
         fetchGameData();
       }
     }
-
-    // Call this function to set the username from the URL and fetch data
-    setUsernameAndFetch();
 	
 function debounce(func, wait) {
   let timeout;
@@ -385,20 +513,6 @@ function clearFilters() {
   applyFilters();
 }
 
-function getUrlParameter(parameterName) {
-  const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get(parameterName);
-}
-
-function setUsernameAndFetch() {
-  const usernameParam = getUrlParameter("username");
-  if (usernameParam) {
-    const usernameInput = document.getElementById("username");
-    usernameInput.value = usernameParam;
-    fetchGameData();
-  }
-}
-
 // Call this function to set the username from the URL and fetch data
 setUsernameAndFetch();
 
@@ -406,6 +520,42 @@ setUsernameAndFetch();
 document.getElementById("player-number").addEventListener("input", debounce(applyFilters, 300));
 document.getElementById("duration").addEventListener("input", debounce(applyFilters, 300));
 document.getElementById("min-bgg-rating").addEventListener("input", debounce(applyFilters, 300));
+
+function toggleCollapsibleContent(event) {
+  const content = event.target.nextElementSibling;
+  if (content.style.maxHeight) {
+    content.style.maxHeight = null;
+  } else {
+    content.style.maxHeight = content.scrollHeight + "px";
+  }
+}
+
+document.querySelectorAll(".collapsible-header").forEach(header => {
+  header.addEventListener("click", toggleCollapsibleContent);
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const collapsibleHeaders = document.querySelectorAll(".collapsible-header");
+
+  collapsibleHeaders.forEach((header) => {
+    header.setAttribute("data-collapsed", "false");
+    header.nextElementSibling.style.maxHeight = "1000px";
+
+    header.addEventListener("click", () => {
+      const isCollapsed = header.getAttribute("data-collapsed") === "true";
+      header.setAttribute("data-collapsed", isCollapsed ? "false" : "true");
+      header.nextElementSibling.style.maxHeight = isCollapsed ? "1000px" : "0";
+    });
+  });
+});
+document.querySelectorAll(".collapsible-header").forEach(header => {
+  header.addEventListener("click", () => {
+    const content = header.nextElementSibling;
+    content.style.maxHeight = content.style.maxHeight ? null : content.scrollHeight + "px";
+    header.querySelector(".chevron").classList.toggle("rotate-down");
+    header.querySelector(".chevron").classList.toggle("rotate-up");
+  });
+});
   </script>
 </body>
 </html>
