@@ -7,9 +7,31 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css" crossorigin="anonymous">
   <title>Hit The Table!</title>
 <style>
-    :root {
-      --vh: 0px;
-    }
+
+.export-csv-btn {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
+.title-container {
+  background-color: #ffffff;
+  padding: 10px;
+}
+.logo {
+  height: 40px; /* Adjust the height to your preference */
+  width: auto;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
 body {
     position: relative;
     min-height: 100vh;
@@ -69,16 +91,16 @@ h1::after {
 }
 
 .background-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-	height: calc(var(--vh) * 100);
-    background-image: url('background.png');
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: cover;
-    z-index: -1;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-color: #F0F0F0;
+  z-index: -1;
 }
 
 .collapsible-content {
@@ -307,6 +329,8 @@ h1::after {
       }
     
   }
+  
+
 </style>
 </head>
 <body>
@@ -321,7 +345,9 @@ h1::after {
 </script>
   <div class="background-container"></div>
   <div class="container">
-    <h1>Hit The Table!</h1>
+  <div class="title-container">
+<h1><img src="logo.png" alt="Logo" class="logo">Hit The Table!</h1>
+</div>
 <div class="collapsible-header">
   Username Entry
   <span class="chevron rotate-down"></span>
@@ -364,6 +390,7 @@ h1::after {
 
 </div><br>
 	  <button onclick="chooseForMe()">Choose for me!</button>
+	  <button id="exportCSV" class="export-csv-btn">Export to CSV</button>
 	  <br>
 	<div id="loading-message" style="display: none; text-align: center;">Loading...</div>
 	<div id="error-message" style="display: none; text-align: center; color: red;">Error: Please check that you are entering a real BGG username with a public Collection.</div>
@@ -624,28 +651,56 @@ document.querySelectorAll(".collapsible-header").forEach(header => {
     header.querySelector(".chevron").classList.toggle("rotate-up");
   });
 });
+function downloadCSV(csv, filename) {
+  var csvFile;
+  var downloadLink;
 
-function setBgContainerHeight() {
-  const bgContainer = document.querySelector('.background-container');
-  bgContainer.style.height = `${window.innerHeight}px`;
+  // CSV FILE
+  csvFile = new Blob([csv], {type: "text/csv"});
+
+  // Download link
+  downloadLink = document.createElement("a");
+
+  // File name
+  downloadLink.download = filename;
+
+  // Create a link to the file
+  downloadLink.href = window.URL.createObjectURL(csvFile);
+
+  // Hide download link
+  downloadLink.style.display = "none";
+
+  // Add the link to DOM
+  document.body.appendChild(downloadLink);
+
+  // Click download link
+  downloadLink.click();
 }
 
-// Set the initial height
-setBgContainerHeight();
+function exportTableToCSV(filename) {
+  var csv = [];
+  var rows = document.querySelectorAll("table tr");
+  
+  for (var i = 0; i < rows.length; i++) {
+    var row = [], cols = rows[i].querySelectorAll("td, th");
+    
+    for (var j = 0; j < cols.length; j++) {
+      // Enclose each value in double quotes to handle commas within the data
+      row.push('"' + cols[j].innerText.replace(/"/g, '""') + '"');
+    }
+    
+    csv.push(row.join(","));        
+  }
 
-// Update the height when the window is resized
-window.addEventListener('resize', setBgContainerHeight);
-
-function setVhVariable() {
-  const vh = window.innerHeight * 0.01;
-  document.documentElement.style.setProperty('--vh', `${vh}px`);
+  // Download CSV
+  downloadCSV(csv.join("\n"), filename);
 }
 
-// Set the initial value for the --vh variable
-setVhVariable();
+document.getElementById("exportCSV").addEventListener("click", function () {
+  var html = document.querySelector("table").outerHTML;
+  exportTableToCSV("table_data.csv");
+});
 
-// Update the --vh variable when the window is resized
-window.addEventListener('resize', setVhVariable);
   </script>
 </body>
 </html>
