@@ -349,7 +349,7 @@ h1::after {
 <h1><img src="logo.png" alt="Logo" class="logo">Hit The Table!</h1>
 </div>
 <div class="collapsible-header">
-  Username Entry
+  BGG Username Entry
   <span class="chevron rotate-down"></span>
 </div>
   <div class="collapsible-content">
@@ -390,7 +390,7 @@ h1::after {
 
 </div><br>
 	  <button onclick="chooseForMe()">Choose for me!</button>
-	  <button id="exportCSV" class="export-csv-btn">Export to CSV</button>
+<button id="exportCSV" class="btn btn-primary" style="margin: 10px;">Export to CSV</button>
 	  <br>
 	<div id="loading-message" style="display: none; text-align: center;">Loading...</div>
 	<div id="error-message" style="display: none; text-align: center; color: red;">Error: Please check that you are entering a real BGG username with a public Collection.</div>
@@ -682,19 +682,23 @@ function exportTableToCSV(filename) {
   var rows = document.querySelectorAll("table tr");
   
   for (var i = 0; i < rows.length; i++) {
-    var row = [], cols = rows[i].querySelectorAll("td, th");
-    
-    for (var j = 0; j < cols.length; j++) {
-      // Enclose each value in double quotes to handle commas within the data
-      row.push('"' + cols[j].innerText.replace(/"/g, '""') + '"');
-    }
-    
-    csv.push(row.join(","));        
+    // Check if the row is visible
+    if (rows[i].style.display !== "none") {
+      var row = [], cols = rows[i].querySelectorAll("td, th");
+      
+      for (var j = 0; j < cols.length; j++) {
+        // Enclose each value in double quotes to handle commas within the data
+        row.push('"' + cols[j].innerText.replace(/"/g, '""') + '"');
+      }
+      
+      csv.push(row.join(",")); 
+    }       
   }
 
   // Download CSV
   downloadCSV(csv.join("\n"), filename);
 }
+
 
 document.getElementById("exportCSV").addEventListener("click", function () {
   var html = document.querySelector("table").outerHTML;
