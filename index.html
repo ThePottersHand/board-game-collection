@@ -7,7 +7,9 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css" crossorigin="anonymous">
   <title>Hit The Table!</title>
 <style>
-
+    :root {
+      --vh: 0px;
+    }
 body {
     position: relative;
     min-height: 100vh;
@@ -71,6 +73,7 @@ h1::after {
     top: 0;
     left: 0;
     width: 100%;
+	height: calc(var(--vh) * 100);
     background-image: url('background.png');
     background-repeat: no-repeat;
     background-position: center center;
@@ -632,6 +635,17 @@ setBgContainerHeight();
 
 // Update the height when the window is resized
 window.addEventListener('resize', setBgContainerHeight);
+
+function setVhVariable() {
+  const vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--vh', `${vh}px`);
+}
+
+// Set the initial value for the --vh variable
+setVhVariable();
+
+// Update the --vh variable when the window is resized
+window.addEventListener('resize', setVhVariable);
   </script>
 </body>
 </html>
